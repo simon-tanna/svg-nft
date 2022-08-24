@@ -25,8 +25,8 @@ const deployMonsterNFT: DeployFunction = async function (
 	let svg = fs.readFileSync(filepath, { encoding: "utf8" });
 	// svg will be passed in to the create function of the contract
 	const monsterNFTContract = await ethers.getContractFactory("MonsterNFT");
-	const accounts = await hre.ethers.getSigners();
-	const signer: any = accounts[0];
+	const accounts: any = await hre.ethers.getSigners();
+	const signer = accounts[0];
 	const monsterNFT = new ethers.Contract(
 		MonsterNFT.address,
 		monsterNFTContract.interface,
@@ -36,6 +36,11 @@ const deployMonsterNFT: DeployFunction = async function (
 	log(
 		`Verify with: \n npx hardhat verify --network ${networkName} ${monsterNFT.address}`
 	);
+	// call the create function
+	let transactionResponse = await monsterNFT.create(svg);
+	let receipt = await transactionResponse.wait(1);
+	log("You've minted an NFT");
+	log(`You can view the tokenURI here: ${await monsterNFT.tokenURI(0)}`);
 };
 
 // module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
