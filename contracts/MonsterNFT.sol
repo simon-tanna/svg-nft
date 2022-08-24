@@ -17,6 +17,9 @@ contract MonsterNFT is ERC721URIStorage, Ownable {
     IERC20 public tokenAddress;
     uint256 public tokenRate = 15 * 10**18;
 
+    // create an event to be invoked in the the create function
+    event CreatedSVGNFT(uint256 indexed tokenId, string tokenURI);
+
     Counters.Counter private _tokenIdCounter;
 
     constructor(address _tokenAddress) ERC721("MonsterNFT", "MFT") {
@@ -24,18 +27,22 @@ contract MonsterNFT is ERC721URIStorage, Ownable {
         tokenAddress = IERC20(_tokenAddress);
     }
 
-    function create(string memory svg) public {
+    function create(string memory _svg) public {
         // SVG needs to become a token URI (Unique Resource Identifier)
         // this is the image URI
-        string memory imgURI = svgToImageURI(svg);
+        string memory imgURI = svgToImageURI(_svg);
+        // call the format token URI
+        string memory tokenURI = formatTokenURI(imgURI);
         tokenAddress.transferFrom(msg.sender, address(this), tokenRate);
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
+        _setTokenURI(tokenId, tokenURI);
+        emit CreatedSVGNFT(tokenId, tokenURI);
         _safeMint(msg.sender, tokenId);
     }
 
     // function to make svg image readable in the create function to mint the NFT
-    function svgToImageURI(string memory svg)
+    function svgToImageURI(string memory _svg)
         public
         pure
         returns (string memory)
@@ -43,11 +50,37 @@ contract MonsterNFT is ERC721URIStorage, Ownable {
         // using the openzep base64 contract as a util
         string memory baseURL = "data:image/svg+xml;base64,";
         string memory svgToBase64 = Base64.encode(
-            bytes(string(abi.encodePacked(svg)))
+            bytes(string(abi.encodePacked(_svg)))
         );
         // concat the baseURL and svgToBase64
         string memory imgURI = string(abi.encodePacked(baseURL, svgToBase64));
         return imgURI;
+    }
+
+    function formatTokenURI(string memory _imgURI)
+        public
+        pure
+        returns (string memory)
+    {
+        // define base url to concatenate the base64 encoded json which takes the imageURI
+        string memory baseURL = "data:application/json;base64,";
+        // concatenate the baseURL and the json
+        return
+            string(
+                abi.encodePacked(
+                    baseURL,
+                    // format outputted json to base64 for tokenURI. abi.encodePacked concatenates the imageURI variable
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name": "SVG NFT", "description": "An example", "attributes": "", "image": "',
+                                _imgURI,
+                                '"}'
+                            )
+                        )
+                    )
+                )
+            );
     }
 
     // function safeMint() public {
