@@ -22,9 +22,14 @@ contract MonsterNFT is ERC721URIStorage, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor(address _tokenAddress) ERC721("MonsterNFT", "MFT") {
+    // constructor(address _tokenAddress) ERC721("MonsterNFT", "MFT") {
+    //     // _tokenAddress is typecast into an IERC20 variable type
+    //     tokenAddress = IERC20(_tokenAddress);
+    // }
+
+    constructor() ERC721("MonsterNFT", "MFT") {
         // _tokenAddress is typecast into an IERC20 variable type
-        tokenAddress = IERC20(_tokenAddress);
+        // tokenAddress = IERC20(_tokenAddress);
     }
 
     function create(string memory _svg) public {
@@ -90,10 +95,10 @@ contract MonsterNFT is ERC721URIStorage, Ownable {
     //     _safeMint(msg.sender, tokenId);
     // }
 
-    function withdrawToken() public onlyOwner {
-        tokenAddress.transfer(
-            msg.sender,
-            tokenAddress.balanceOf(address(this))
-        );
-    }
+    // function withdrawToken() public onlyOwner {
+    //     tokenAddress.transfer(
+    //         msg.sender,
+    //         tokenAddress.balanceOf(address(this))
+    //     );
+    // }
 }
