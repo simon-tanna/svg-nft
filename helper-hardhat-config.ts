@@ -10,6 +10,9 @@ export const networkConfig: networkConfigInfo = {
 	31337: {
 		name: "localhost",
 	},
+	80001: {
+		name: "matic",
+	},
 };
 
 // export const networkConfig = {
